@@ -15,6 +15,7 @@ export function init() {
 
 function showEventsByTitle(data: any) {
     document.getElementById("events")?.replaceChildren();
+    displayLoadingIcon("block");
     showEventsByMonth(data);
 
 }
@@ -85,8 +86,7 @@ function buildEventsHTML(data: any) {
         section.appendChild(urlParagraph);
         urlParagraph.appendChild(urlAnchor);
 
-        let loadingIconSection = document.getElementById("loading-icon-section");
-        loadingIconSection?.remove();
+        displayLoadingIcon("none");
 
         sectionsArray.push(section);
 
@@ -120,4 +120,19 @@ function submitHandler(e: Event) {
             console.log(data);
             showEventsByTitle(data);
         });
+}
+
+function displayLoadingIcon(displayMode : string){
+    const loadingIconSection = document.getElementById("loading-icon-section");
+
+    if (loadingIconSection !== null) {
+
+        if ( displayMode == "none" || "block" ) {
+            loadingIconSection.style.display = displayMode;
+            console.log(loadingIconSection.style.display);
+        } else {
+            throw new Error("Mode d'affichage de l'icône de chargement inconnue.");
+        }
+
+    }
 }
