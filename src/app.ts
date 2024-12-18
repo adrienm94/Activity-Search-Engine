@@ -1,9 +1,9 @@
 import { loadEvents, loadEventsByTitle } from "./services/api";
 
 export function init() {
-    console.log("initialisation");
+
     loadEvents().then(data => {
-        showEventsByMonth(data);
+        showEvents(data);
     });
 
     const form = document.querySelector("form");
@@ -13,14 +13,21 @@ export function init() {
     nextPage?.addEventListener("click", goToNextPage);
 }
 
+/**
+ * Renders events matching title from data
+ * @param data 
+ */
 function showEventsByTitle(data: any) {
     document.getElementById("events")?.replaceChildren();
     displayLoadingIcon("block");
-    showEventsByMonth(data);
-
+    showEvents(data);
 }
 
-function showEventsByMonth(data: any) {
+/**
+ * Render events from data
+ * @param data 
+ */
+function showEvents(data: any) {
     const eventsHTML = buildEventsHTML(data);
     const sectionsArray = eventsHTML[0] as HTMLElement[];
     const sections = eventsHTML[1] as HTMLElement;
@@ -32,18 +39,22 @@ function showEventsByMonth(data: any) {
 
 }
 
+/**
+ * Build the HTML logic for events
+ * @param data 
+ * @returns An array composed of an array with section elements and the element wrapping all section elements
+ */
 function buildEventsHTML(data: any) {
 
+    let sectionsArray: HTMLElement[] = [];
+
+    // Initialize events section when init
     if (!document.getElementById("events")) {
         const eventsSection = document.createElement("section");
         const loadingIconSection = document.getElementById("loading-icon-section");
         eventsSection.id = "events";
         loadingIconSection?.insertAdjacentElement("afterend", eventsSection);
     }
-
-    console.log(document.getElementById("events"));
-
-    let sectionsArray: HTMLElement[] = [];
 
     data.results.forEach((element: any) => {
 
@@ -92,6 +103,7 @@ function buildEventsHTML(data: any) {
 
     })
 
+    // Remove the next page button when max number of events is reached
     if (document.getElementById("events")?.childElementCount === data.total_count) {
         const nextPage = document.getElementById("next-page-button");
         nextPage?.remove();
@@ -100,16 +112,41 @@ function buildEventsHTML(data: any) {
     return [sectionsArray, document.getElementById("events")];
 }
 
+/**
+ * Logic processed to display loading icon
+ * @param displayMode 
+ */
+function displayLoadingIcon(displayMode : string){
+    const loadingIconSection = document.getElementById("loading-icon-section");
+
+    if (loadingIconSection !== null) {
+
+        if ( displayMode == "none" || "block" ) {
+            loadingIconSection.style.display = displayMode;
+        } else {
+            throw new Error("Mode d'affichage de l'icône de chargement inconnue.");
+        }
+
+    }
+}
+
+/**
+ * Logic processed when clicking on the bottom arrow
+ * @param e 
+ */
 function goToNextPage(e: Event) {
-    console.log("btn cliqué");
     const sections = document.getElementById("events");
     const numberOfEventsShowed = sections?.childElementCount;
     loadEvents(numberOfEventsShowed).then(data => {
-        showEventsByMonth(data);
+        showEvents(data);
     }
     );
 }
 
+/**
+ * Manages form submit to search events from a title 
+ * @param e 
+ */
 function submitHandler(e: Event) {
     e.preventDefault();
     const title = document.querySelector("input[name='title']") as HTMLInputElement;
@@ -120,19 +157,4 @@ function submitHandler(e: Event) {
             console.log(data);
             showEventsByTitle(data);
         });
-}
-
-function displayLoadingIcon(displayMode : string){
-    const loadingIconSection = document.getElementById("loading-icon-section");
-
-    if (loadingIconSection !== null) {
-
-        if ( displayMode == "none" || "block" ) {
-            loadingIconSection.style.display = displayMode;
-            console.log(loadingIconSection.style.display);
-        } else {
-            throw new Error("Mode d'affichage de l'icône de chargement inconnue.");
-        }
-
-    }
 }
