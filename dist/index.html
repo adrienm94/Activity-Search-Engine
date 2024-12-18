@@ -12,17 +12,22 @@
     <header>
 
     </header>
-    <main>
-        <form action="" method="post">
+    <main id="main">
+        <h1>&Eacute;vénements sur Montpellier et ses alentours</h1>
+        <form action="" method="post" id="search-form">
             <input type="text" name="title" id="title" placeholder="Rechercher...">
-            <button type="submit"  title="Rechercher par titre"><i class="fa-brands fa-searchengin"></i></button>
+            <select id="select-title" title="Menu déroulant"></select>
+            <button type="submit" title="Rechercher par titre"><i class="fa-brands fa-searchengin"></i></button>
         </form>
-        <section id="events">
-            
+        <section id="loading-icon-section">
+            <p><i class='fa-solid fa-circle-notch fa-spin'></i></p>
+        </section>
+        <section id="next-page">
+            <button type="button" title="Page suivante" id="next-page-button"><i class="fa-solid fa-angles-down"></i></i></button>
         </section>
     </main>
     <footer>
-
+        &copy; 2024 - Adrien MEYRAND - Tous Droits Réservés
     </footer>
 </body>
 

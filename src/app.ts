@@ -9,6 +9,9 @@ export function init() {
     const form = document.querySelector("form");
     form?.addEventListener("submit", submitHandler);
 
+    const inputTitle = form?.querySelector("#title");
+    inputTitle?.addEventListener("input", inputHandler);
+
     const nextPage = document.getElementById("next-page-button");
     nextPage?.addEventListener("click", goToNextPage);
 }
@@ -132,9 +135,8 @@ function displayLoadingIcon(displayMode : string){
 
 /**
  * Logic processed when clicking on the bottom arrow
- * @param e 
  */
-function goToNextPage(e: Event) {
+function goToNextPage() {
     const sections = document.getElementById("events");
     const numberOfEventsShowed = sections?.childElementCount;
     loadEvents(numberOfEventsShowed).then(data => {
@@ -144,15 +146,50 @@ function goToNextPage(e: Event) {
 }
 
 /**
+ * WORKS BUT THIS METHOD IS IN DRAFT STATE : enables to render a select menu dynamically when typing in search field
+ * @param e 
+ */
+async function inputHandler(){
+    const titleInput = document.querySelector("input[name='title']") as HTMLInputElement;
+
+    if (titleInput){
+        if (titleInput.value) {
+            const eventsByTitle = loadEventsByTitle(titleInput);
+            const titleSelect = document.getElementById("select-title");
+
+            if (titleSelect || (titleInput.value === "")) {
+                titleSelect?.replaceChildren();
+            }
+
+            eventsByTitle.then(
+                (data => {
+                    data.results.forEach((element : any) => {
+                        const titleSelectOption = document.createElement("option");
+                        titleSelectOption.value = element.event_titre;
+                        titleSelectOption.textContent = titleSelectOption.value;
+                        titleSelectOption.addEventListener("click",() => {
+                            titleInput.value = titleSelectOption.value;
+                        })
+                        titleSelect?.appendChild(titleSelectOption);
+                    })
+
+                })
+            )
+        }
+
+    };
+}
+
+/**
  * Manages form submit to search events from a title 
  * @param e 
  */
-function submitHandler(e: Event) {
+function submitHandler(e: SubmitEvent) {
     e.preventDefault();
-    const title = document.querySelector("input[name='title']") as HTMLInputElement;
+    const titleInput = document.querySelector("input[name='title']") as HTMLInputElement;
     const nextPage = document.getElementById("next-page-button");
     nextPage?.remove();
-    loadEventsByTitle(title)
+    loadEventsByTitle(titleInput)
         .then(data => {
             console.log(data);
             showEventsByTitle(data);
