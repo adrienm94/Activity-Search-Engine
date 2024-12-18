@@ -3,7 +3,7 @@ import { loadEvents, loadEventsByTitle } from "./services/api";
 export function init() {
     console.log("initialisation");
     loadEvents().then(data => {
-        showEvents(data);
+        showEventsByMonth(data);
     });
 
     const form = document.querySelector("form");
@@ -13,11 +13,38 @@ export function init() {
     nextPage?.addEventListener("click", goToNextPage);
 }
 
-function showEvents(data : any){
+function showEventsByTitle(data: any) {
+    document.getElementById("events")?.replaceChildren();
+    showEventsByMonth(data);
 
-    const sections = document.getElementById("events");
+}
 
-    data.results.forEach((element : any) => {
+function showEventsByMonth(data: any) {
+    const eventsHTML = buildEventsHTML(data);
+    const sectionsArray = eventsHTML[0] as HTMLElement[];
+    const sections = eventsHTML[1] as HTMLElement;
+    console.log(sectionsArray);
+    console.log(sections);
+    sectionsArray?.forEach((section) => {
+        sections?.appendChild(section);
+    })
+
+}
+
+function buildEventsHTML(data: any) {
+
+    if (!document.getElementById("events")) {
+        const eventsSection = document.createElement("section");
+        const loadingIconSection = document.getElementById("loading-icon-section");
+        eventsSection.id = "events";
+        loadingIconSection?.insertAdjacentElement("afterend", eventsSection);
+    }
+
+    console.log(document.getElementById("events"));
+
+    let sectionsArray: HTMLElement[] = [];
+
+    data.results.forEach((element: any) => {
 
         let event = JSON.parse(element.event);
 
@@ -58,23 +85,27 @@ function showEvents(data : any){
         section.appendChild(urlParagraph);
         urlParagraph.appendChild(urlAnchor);
 
-        sections?.appendChild(section);
+        let loadingIconSection = document.getElementById("loading-icon-section");
+        loadingIconSection?.remove();
+
+        sectionsArray.push(section);
 
     })
 
-    if (sections?.childElementCount === data.total_count) {
+    if (document.getElementById("events")?.childElementCount === data.total_count) {
         const nextPage = document.getElementById("next-page-button");
         nextPage?.remove();
     }
 
+    return [sectionsArray, document.getElementById("events")];
 }
 
-function goToNextPage(e : Event) {
+function goToNextPage(e: Event) {
     console.log("btn cliqué");
     const sections = document.getElementById("events");
     const numberOfEventsShowed = sections?.childElementCount;
-    loadEvents(numberOfEventsShowed).then( data => {
-        showEvents(data);
+    loadEvents(numberOfEventsShowed).then(data => {
+        showEventsByMonth(data);
     }
     );
 }
@@ -82,5 +113,11 @@ function goToNextPage(e : Event) {
 function submitHandler(e: Event) {
     e.preventDefault();
     const title = document.querySelector("input[name='title']") as HTMLInputElement;
-    loadEventsByTitle(title);
+    const nextPage = document.getElementById("next-page-button");
+    nextPage?.remove();
+    loadEventsByTitle(title)
+        .then(data => {
+            console.log(data);
+            showEventsByTitle(data);
+        });
 }
