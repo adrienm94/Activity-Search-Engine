@@ -1,6 +1,6 @@
-# empty-project
+# Activity Search Engine (draft)
 
-Empty project.
+A mini project to find any events on Montpellier during the current month 
 
 ## Building and running on localhost
 
